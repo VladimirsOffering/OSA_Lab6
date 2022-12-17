@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:OSA_Lab6"
         xmlns:viewmodels="clr-namespace:OSA_Lab6.ViewModels"
         mc:Ignorable="d"
-        Title="{Binding CurrentPage}" Height="450" Width="800">
+        Title="{Binding CurrentPage}" Height="450" Width="800"
+        WindowState="Maximized"
+        >
     <Window.DataContext>
         <viewmodels:MainViewModel></viewmodels:MainViewModel>
     </Window.DataContext>

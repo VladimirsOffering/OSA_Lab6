@@ -4,18 +4,100 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:OSA_Lab6.Pages"
+      xmlns:dataGrid2D="http://gu.se/DataGrid2D"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="1000" d:DesignWidth="1200"
       Title="MainPage">
 
-    <WrapPanel>
-        <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Border Style="{StaticResource ContentBorder}">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Border Style="{StaticResource Container}">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Title}" Text="Критерий Вальда(maxmin)"></TextBlock>
-                    <TextBlock Text="{Binding WaldCriterion}"></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="Исходная табллица альтернатив"></TextBlock>
+                    <DataGrid HeadersVisibility="None" dataGrid2D:ItemsSource.Array2D="{Binding values}" />
                 </StackPanel>
             </Border>
+        </StackPanel>
+        <Border Style="{StaticResource Container}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource Title}" Text="Задание 1"></TextBlock>
+                <WrapPanel>
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий Вальда(maxmin)"></TextBlock>
+                                <TextBlock Text="{Binding WaldCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding WaldCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий азартного игрока(maxmax)"></TextBlock>
+                                <TextBlock Text="{Binding GamblerCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding GamblerCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий Гурвица"></TextBlock>
+                                <TextBlock Text="{Binding HurwitzCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding HurwitzCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий Лапласа"></TextBlock>
+                                <TextBlock Text="{Binding LaplasCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding LaplasCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий произведений"></TextBlock>
+                                <TextBlock Text="{Binding MultiplyCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding MultiplyCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+                </WrapPanel>
+            </StackPanel>
         </Border>
-    </WrapPanel>
+        <Border Style="{StaticResource Container}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource Title}" Text="Задание 2"></TextBlock>
+                <WrapPanel>
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий Севеджа"></TextBlock>
+                                <TextBlock Text="{Binding SavageCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding SavageCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Container}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource Title}" Text="Задание 3"></TextBlock>
+                <WrapPanel>
+
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
 </Page>
