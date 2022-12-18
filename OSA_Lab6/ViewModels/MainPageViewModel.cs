@@ -24,15 +24,45 @@ namespace OSA_Lab6.ViewModels
         public double LaplasCriterion { get; private set; }
         public int LaplasCriterionIndex { get; private set; }
 
+        public double MultiplyCriterion { get; private set; }
+        public int MultiplyCriterionIndex { get; private set; }
+
+
         public double SavageCriterion { get; private set; }
         public int SavageCriterionIndex { get; private set; }
 
-
-        public double MultiplyCriterion { get; private set; }
-        public int MultiplyCriterionIndex { get; private set; }
+        public double LaplasRegretsCriterion { get; private set; }
+        public int LaplasRegretsCriterionIndex { get; private set; }
         #endregion
 
-        public double[,] values { get; set; }
+
+
+        #region Матрицы
+
+        public double[,] SourceMatrix { get; private set; }
+
+        double[,] positiveMatrix;
+        public double[,] PositiveMatrix
+        {
+            get => positiveMatrix;
+            private set
+            {
+                positiveMatrix = value;
+                OnPropertyChanged("PositiveMatrix");
+            }
+        }
+
+
+        double[,] missedOpportunitiesMatrix;
+        public double[,] MissedOpportunitiesMatrix
+        {
+            get => missedOpportunitiesMatrix;
+            private set
+            {
+                missedOpportunitiesMatrix = value;
+                OnPropertyChanged("MissedOpportunitiesMatrix");
+            }
+        }
 
 
         public List<List<double>> Rows { get; private set; }
@@ -40,6 +70,7 @@ namespace OSA_Lab6.ViewModels
         List<List<double>> Columns;
 
         List<List<double>> MissedOpportunities;
+        #endregion
 
 
         private List<List<double>> ConvertArrToRowsList(double[,] values)
@@ -75,9 +106,28 @@ namespace OSA_Lab6.ViewModels
         }
 
 
+        private double[,] ConvertListToArr(IEnumerable<IEnumerable<double>> values)
+        {
+            double[,] result = new double[values.Count(), values.First().Count()];
+
+            int i = 0;
+            foreach (var row in values)
+            {
+                int j = 0;
+                foreach (var item in row)
+                {
+                    result[i, j] = item;
+                    j++;
+                }
+                i++;
+            }
+            return result;
+        }
+
+
         public MainPageViewModel(double[,] values)
         {
-            this.values = values;
+            SourceMatrix = values;
             Rows = ConvertArrToRowsList(values);
             Columns = ConvertArrToColumnsList(values);
 
@@ -85,30 +135,34 @@ namespace OSA_Lab6.ViewModels
 
         }
 
-        public async void Start()
+        public void Start()
         {
-            await Task.Run(() => 
-            {
-                //Часть 1             
-                MaxMin();
-                MaxMax();
-                CalculateHurwitz(0.5);
-                CalculateLaplas();
-                CalculateMultiplyCriterion();
+
+            //Часть 1             
+            MaxMin();
+            MaxMax();
+            CalculateHurwitz(0.5);
+            var Laplas = CalculateLaplas(Rows);
+            LaplasCriterion = Laplas.value;
+            LaplasCriterionIndex = Laplas.index;
+            CalculateMultiplyCriterion();
 
 
-                //Часть 2
-                SavageCriterion = CalculateSavage(Columns).Value;
-                SavageCriterionIndex = CalculateSavage(Columns).Index;
+            //Часть 2
+            CalculateRegretsMatrix();
+            CalculateSavage();
+            var LaplasRegrets = CalculateLaplas(MissedOpportunities);
+            LaplasRegretsCriterion = LaplasRegrets.value;
+            LaplasRegretsCriterionIndex = LaplasRegrets.index;
 
-            });
+
         }
 
 
         public void MaxMin()
         {
             WaldCriterion = Rows.Max(x => x.Min());
-            WaldCriterionIndex = Rows.FindIndex(x => x.Min() == WaldCriterion)+1;
+            WaldCriterionIndex = Rows.FindIndex(x => x.Min() == WaldCriterion) + 1;
         }
 
         public void MaxMax()
@@ -119,8 +173,8 @@ namespace OSA_Lab6.ViewModels
 
         public void CalculateHurwitz(double lambda)
         {
-            HurwitzCriterion = Rows.Max(x => (x.Min() * (1-lambda) + x.Max() * lambda));
-            HurwitzCriterionIndex = Rows.FindIndex(x => (x.Min() * (1 - lambda) + x.Max() * lambda) == HurwitzCriterion)+1;
+            HurwitzCriterion = Rows.Max(x => (x.Min() * (1 - lambda) + x.Max() * lambda));
+            HurwitzCriterionIndex = Rows.FindIndex(x => (x.Min() * (1 - lambda) + x.Max() * lambda) == HurwitzCriterion) + 1;
         }
 
 
@@ -129,17 +183,37 @@ namespace OSA_Lab6.ViewModels
             var HurwitzCriterion = Rows.Max(x => (x.Min() * (1 - lambda) + x.Max() * lambda));
         }
 
-        public void CalculateLaplas()
+        public (double value, int index) CalculateLaplas(List<List<double>> source)
         {
-            LaplasCriterion = Rows.Max(x => x.Average());
-            LaplasCriterionIndex = Rows.FindIndex(x => x.Average() == LaplasCriterion) + 1;
+            var LaplasCriterion = source.Max(x => x.Average());
+            var LaplasCriterionIndex = source.FindIndex(x => x.Average() == LaplasCriterion) + 1;
+
+            return (LaplasCriterion, LaplasCriterionIndex);
         }
 
         public void CalculateMultiplyCriterion()
         {
             double Max = double.MinValue;
             int Index = 0;
-            foreach (var row in Rows)
+
+            PositiveMatrix = new double[SourceMatrix.GetLength(0), SourceMatrix.GetLength(1)];
+            Array.Copy(SourceMatrix, PositiveMatrix, SourceMatrix.Length);
+
+            var Min = Rows.Min(x => x.Min());
+            if (Min < 0)
+            {
+                for (int i = 0; i < PositiveMatrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < PositiveMatrix.GetLength(1); j++)
+                    {
+                        PositiveMatrix[i, j] += (Min * -1) + 1;
+                    }
+                }
+            }
+
+            List<List<double>> Positive = ConvertArrToRowsList(PositiveMatrix);
+
+            foreach (var row in Positive)
             {
                 double mul = 1;
                 foreach (var item in row)
@@ -150,14 +224,14 @@ namespace OSA_Lab6.ViewModels
                 {
                     Max = mul;
                     MultiplyCriterion = Max;
-                    MultiplyCriterionIndex = Index+1;
+                    MultiplyCriterionIndex = Index + 1;
                 }
                 Index++;
             }
         }
 
 
-        public (double Value, int Index) CalculateSavage(List<List<double>> source)
+        public void CalculateRegretsMatrix()
         {
             MissedOpportunities = new List<List<double>>();
 
@@ -172,21 +246,27 @@ namespace OSA_Lab6.ViewModels
 
                 MissedOpportunities.Add(MissedColumn);
             }
+            MissedOpportunitiesMatrix = ConvertListToArr(MissedOpportunities.Transpose());
 
+            MissedOpportunities = ConvertArrToRowsList(MissedOpportunitiesMatrix);
+        }
+
+        public void CalculateSavage()
+        {
             double MinValue = double.MaxValue;
             int MinIndex = 0;
 
-            foreach (var row in MissedOpportunities.Transpose().Select((value, i) => new { i, value }))
+            foreach (var row in MissedOpportunities.Select((value, i) => new { i, value }))
             {
                 if (row.value.Max() < MinValue)
                 {
                     MinValue = row.value.Max();
-                    MinIndex = row.i+1;
+                    MinIndex = row.i + 1;
                 }
-                
-            }
 
-            return (MinValue, MinIndex);
+            }
+            SavageCriterion = MinValue;
+            SavageCriterionIndex = MinIndex;
 
         }
 

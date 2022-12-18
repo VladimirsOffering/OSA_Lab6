@@ -13,14 +13,29 @@
         <StackPanel Orientation="Horizontal">
             <Border Style="{StaticResource Container}">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Title}" Text="Исходная табллица альтернатив"></TextBlock>
-                    <DataGrid HeadersVisibility="None" dataGrid2D:ItemsSource.Array2D="{Binding values}" />
+                    <TextBlock Style="{StaticResource Title}" Text="Исходная матрица"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding SourceMatrix}" />
                 </StackPanel>
             </Border>
+
+            <Border Style="{StaticResource Container}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Title}" Text="Позитивная матрица"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding PositiveMatrix}" />
+                </StackPanel>
+            </Border>
+            
+            <Border Style="{StaticResource Container}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Title}" Text="Матрица сожалений"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding MissedOpportunitiesMatrix}" />
+                </StackPanel>
+            </Border>
+
         </StackPanel>
         <Border Style="{StaticResource Container}">
             <StackPanel>
-                <TextBlock Style="{StaticResource Title}" Text="Задание 1"></TextBlock>
+                <TextBlock Style="{StaticResource Title}" Text="Классические критерии"></TextBlock>
                 <WrapPanel>
                     <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Border Style="{StaticResource ContentBorder}">
@@ -76,14 +91,24 @@
         </Border>
         <Border Style="{StaticResource Container}">
             <StackPanel>
-                <TextBlock Style="{StaticResource Title}" Text="Задание 2"></TextBlock>
+                <TextBlock Style="{StaticResource Title}" Text="Критерии с сожалениями"></TextBlock>
                 <WrapPanel>
                     <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Border Style="{StaticResource ContentBorder}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource Title}" Text="Критерий Севеджа"></TextBlock>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий Сэвиджа"></TextBlock>
                                 <TextBlock Text="{Binding SavageCriterion}"></TextBlock>
                                 <TextBlock Text="{Binding SavageCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Лаплас с сожалениями"></TextBlock>
+                                <TextBlock Text="{Binding LaplasRegretsCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding LaplasRegretsCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
                             </StackPanel>
                         </Border>
                     </Border>
@@ -93,7 +118,7 @@
 
         <Border Style="{StaticResource Container}">
             <StackPanel>
-                <TextBlock Style="{StaticResource Title}" Text="Задание 3"></TextBlock>
+                <TextBlock Style="{StaticResource Title}" Text="Критерии с вероятностью"></TextBlock>
                 <WrapPanel>
 
                 </WrapPanel>

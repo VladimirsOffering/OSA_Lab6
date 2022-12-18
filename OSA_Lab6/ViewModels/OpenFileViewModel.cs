@@ -58,7 +58,7 @@ namespace OSA_Lab6.ViewModels
         {
             vm = mainViewModel;
             IsEnabled = true;
-            InfoMsg = "Сначала выберем excel файл с исходными данными";
+            InfoMsg = "Сначала нужно выбрать excel файл с исходными данными";
             openFileModel = new OpenFileModel();
         }
         private async void OpenFile()
