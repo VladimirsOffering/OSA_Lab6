@@ -13,6 +13,6 @@
    
     <StackPanel VerticalAlignment="Center" >
         <TextBlock Text="{Binding InfoMsg}" Style="{StaticResource Title}" Foreground="White"></TextBlock>
-        <Button Command="{Binding OpenFileCommand}" IsEnabled="{Binding IsEnabled}" Content="Выбрать файл" HorizontalAlignment="Center" VerticalAlignment="Center"></Button>
+        <Button Command="{Binding OpenFileCommand}" IsEnabled="{Binding IsEnabled}" Content="{Binding ButtonText}" HorizontalAlignment="Center" VerticalAlignment="Center"></Button>
     </StackPanel>
 </Page>

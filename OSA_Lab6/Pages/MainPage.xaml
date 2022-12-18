@@ -6,15 +6,19 @@
       xmlns:local="clr-namespace:OSA_Lab6.Pages"
       xmlns:dataGrid2D="http://gu.se/DataGrid2D"
       mc:Ignorable="d" 
-      d:DesignHeight="1000" d:DesignWidth="1200"
+      d:DesignHeight="1080" d:DesignWidth="1920"
       Title="MainPage">
 
     <StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <WrapPanel Orientation="Horizontal">
             <Border Style="{StaticResource Container}">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Title}" Text="Исходная матрица"></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="Исходные данные"></TextBlock>
                     <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding SourceMatrix}" />
+                    <Separator></Separator>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding PMatrix}" />
+                    <Separator></Separator>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding SMatrix}" />
                 </StackPanel>
             </Border>
 
@@ -32,7 +36,31 @@
                 </StackPanel>
             </Border>
 
-        </StackPanel>
+            <Border Style="{StaticResource Container}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Title}" Text="Вероятности при ССС"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding FullPMatrix}" />
+
+                    <TextBlock Style="{StaticResource Title}" Text="Вероятности Хоменюка"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding HomenyukPMatrix}" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Container}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Title}" Text="Матрица ССС"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding SubjectiveMiddleRegretsMatrix}" />
+                </StackPanel>
+            </Border>
+            
+            <Border Style="{StaticResource Container}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Title}" Text="Матрица Хоменюка"></TextBlock>
+                    <DataGrid IsReadOnly="True" HeadersVisibility="None" HorizontalAlignment="Center" dataGrid2D:ItemsSource.Array2D="{Binding HomenyukMatrix}" />
+                </StackPanel>
+            </Border>
+
+        </WrapPanel>
         <Border Style="{StaticResource Container}">
             <StackPanel>
                 <TextBlock Style="{StaticResource Title}" Text="Классические критерии"></TextBlock>
@@ -109,6 +137,26 @@
                                 <TextBlock Style="{StaticResource Title}" Text="Лаплас с сожалениями"></TextBlock>
                                 <TextBlock Text="{Binding LaplasRegretsCriterion}"></TextBlock>
                                 <TextBlock Text="{Binding LaplasRegretsCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий ССС"></TextBlock>
+                                <TextBlock Text="{Binding SubjectiveMiddleRegretsCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding SubjectiveMiddleRegretsCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <Border Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ContentBorder}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Title}" Text="Критерий Хоменюка"></TextBlock>
+                                <TextBlock Text="{Binding HomenyukCriterion}"></TextBlock>
+                                <TextBlock Text="{Binding HomenyukCriterionIndex, StringFormat={}Альтернатива №{0}}"></TextBlock>
                             </StackPanel>
                         </Border>
                     </Border>

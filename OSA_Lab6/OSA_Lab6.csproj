@@ -67,9 +67,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\ExcelReader.cs" />
-    <Compile Include="Models\Alternatives.cs" />
     <Compile Include="Models\OpenFileModel.cs" />
-    <Compile Include="Models\States.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

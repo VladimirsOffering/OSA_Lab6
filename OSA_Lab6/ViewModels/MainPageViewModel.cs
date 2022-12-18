@@ -33,6 +33,12 @@ namespace OSA_Lab6.ViewModels
 
         public double LaplasRegretsCriterion { get; private set; }
         public int LaplasRegretsCriterionIndex { get; private set; }
+
+        public double SubjectiveMiddleRegretsCriterion { get; private set; }
+        public int SubjectiveMiddleRegretsCriterionIndex { get; private set; }
+
+        public double HomenyukCriterion { get; private set; }
+        public int HomenyukCriterionIndex { get; private set; }
         #endregion
 
 
@@ -41,6 +47,52 @@ namespace OSA_Lab6.ViewModels
 
         public double[,] SourceMatrix { get; private set; }
 
+        public double[,] PMatrix { get; private set; }
+
+        public double[,] SMatrix { get; private set; }
+
+        public double[,] subjectiveMiddleRegretsMatrix;
+        public double[,] SubjectiveMiddleRegretsMatrix
+        {
+            get => subjectiveMiddleRegretsMatrix;
+            private set
+            {
+                subjectiveMiddleRegretsMatrix = value;
+                OnPropertyChanged("SubjectiveMiddleRegretsMatrix");
+            }
+        }
+
+        public double[,] homenyukMatrix;
+        public double[,] HomenyukMatrix
+        {
+            get => homenyukMatrix;
+            private set
+            {
+                homenyukMatrix = value;
+                OnPropertyChanged("HomenyukMatrix");
+            }
+        }
+
+        double[,] fullPMatrix;
+        public double[,] FullPMatrix
+        {
+            get => fullPMatrix;
+            private set
+            {
+                fullPMatrix = value;
+                OnPropertyChanged("FullPMatrix");
+            }
+        }
+        double[,] homenyukPMatrix;
+        public double[,] HomenyukPMatrix
+        {
+            get => homenyukPMatrix;
+            private set
+            {
+                homenyukPMatrix = value;
+                OnPropertyChanged("HomenyukPMatrix");
+            }
+        }
         double[,] positiveMatrix;
         public double[,] PositiveMatrix
         {
@@ -125,11 +177,14 @@ namespace OSA_Lab6.ViewModels
         }
 
 
-        public MainPageViewModel(double[,] values)
+
+        public MainPageViewModel(double[,] AMatrix, double[,] PMatrix, double[,] SMatrix)
         {
-            SourceMatrix = values;
-            Rows = ConvertArrToRowsList(values);
-            Columns = ConvertArrToColumnsList(values);
+            SourceMatrix = AMatrix;
+            this.PMatrix = PMatrix;
+            this.SMatrix = SMatrix;
+            Rows = ConvertArrToRowsList(AMatrix);
+            Columns = ConvertArrToColumnsList(AMatrix);
 
             Start();
 
@@ -150,10 +205,14 @@ namespace OSA_Lab6.ViewModels
 
             //Часть 2
             CalculateRegretsMatrix();
+            CalculateFullPMatrix();
             CalculateSavage();
-            var LaplasRegrets = CalculateLaplas(MissedOpportunities);
+            var LaplasRegrets = CalculateLaplas(MissedOpportunities,true);
             LaplasRegretsCriterion = LaplasRegrets.value;
             LaplasRegretsCriterionIndex = LaplasRegrets.index;
+            CalculateSubjectiveMiddleRegrets();
+            CalculateHomenyukMatrix();
+            CalculateHomenyuk();
 
 
         }
@@ -183,9 +242,9 @@ namespace OSA_Lab6.ViewModels
             var HurwitzCriterion = Rows.Max(x => (x.Min() * (1 - lambda) + x.Max() * lambda));
         }
 
-        public (double value, int index) CalculateLaplas(List<List<double>> source)
+        public (double value, int index) CalculateLaplas(List<List<double>> source, bool regrets = false)
         {
-            var LaplasCriterion = source.Max(x => x.Average());
+            var LaplasCriterion = regrets? source.Min(x => x.Average()): source.Max(x => x.Average());
             var LaplasCriterionIndex = source.FindIndex(x => x.Average() == LaplasCriterion) + 1;
 
             return (LaplasCriterion, LaplasCriterionIndex);
@@ -268,6 +327,72 @@ namespace OSA_Lab6.ViewModels
             SavageCriterion = MinValue;
             SavageCriterionIndex = MinIndex;
 
+        }
+
+        public void CalculateFullPMatrix()
+        {
+            FullPMatrix = new double[1, PMatrix.GetLength(1)];
+
+            int i = 0;
+
+            var FullMatrixSum = Columns.Sum(x => x.Sum());
+
+            foreach (var column in Columns)
+            {
+                FullPMatrix[0, i] = Math.Round(column.Sum() / FullMatrixSum,4);
+                i++;
+            }
+        }
+
+        public void CalculateHomenyukMatrix()
+        {
+            HomenyukPMatrix = new double[1, PMatrix.GetLength(1)];
+
+            int i = 0;
+
+            var FullMatrixSum = MissedOpportunities.Sum(x => x.Sum());
+
+            foreach (var column in MissedOpportunities.Transpose())
+            {
+                HomenyukPMatrix[0, i] = Math.Round(column.Sum() / FullMatrixSum, 4);
+                i++;
+            }
+        }
+
+        public void CalculateSubjectiveMiddleRegrets()
+        {
+            SubjectiveMiddleRegretsMatrix = new double[SourceMatrix.GetLength(0), SourceMatrix.GetLength(1)];
+
+            for (int i = 0; i < SubjectiveMiddleRegretsMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < SubjectiveMiddleRegretsMatrix.GetLength(1); j++)
+                {
+                    SubjectiveMiddleRegretsMatrix[i, j] = MissedOpportunitiesMatrix[i, j] * FullPMatrix[0, j];
+                }
+            }
+
+            var temp = ConvertArrToRowsList(SubjectiveMiddleRegretsMatrix);
+
+            SubjectiveMiddleRegretsCriterion = temp.Min(x=>x.Sum());
+            SubjectiveMiddleRegretsCriterionIndex = temp.FindIndex(x => x.Sum() == SubjectiveMiddleRegretsCriterion) + 1;
+        }
+
+        public void CalculateHomenyuk()
+        {
+            HomenyukMatrix = new double[SourceMatrix.GetLength(0), SourceMatrix.GetLength(1)];
+
+            for (int i = 0; i < HomenyukMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < HomenyukMatrix.GetLength(1); j++)
+                {
+                    HomenyukMatrix[i, j] = SourceMatrix[i, j] * HomenyukPMatrix[0, j];
+                }
+            }
+
+            var temp = ConvertArrToRowsList(HomenyukMatrix);
+
+            HomenyukCriterion = temp.Max(x => x.Sum());
+            HomenyukCriterionIndex = temp.FindIndex(x => x.Sum() == HomenyukCriterion) + 1;
         }
 
     }
