@@ -28,6 +28,8 @@ namespace OSA_Lab6.ViewModels
         public int MultiplyCriterionIndex { get; private set; }
 
 
+
+
         public double SavageCriterion { get; private set; }
         public int SavageCriterionIndex { get; private set; }
 
@@ -39,6 +41,18 @@ namespace OSA_Lab6.ViewModels
 
         public double HomenyukCriterion { get; private set; }
         public int HomenyukCriterionIndex { get; private set; }
+
+
+
+
+        public double MaxProbabilityCriterion { get; private set; }
+        public int MaxProbabilityCriterionIndex { get; private set; }
+
+        public double BayesCriterion { get; private set; }
+        public int BayesCriterionIndex { get; private set; }
+
+        public double HermeyerCriterion { get; private set; }
+        public int HermeyerCriterionIndex { get; private set; }
         #endregion
 
 
@@ -48,8 +62,6 @@ namespace OSA_Lab6.ViewModels
         public double[,] SourceMatrix { get; private set; }
 
         public double[,] PMatrix { get; private set; }
-
-        public double[,] SMatrix { get; private set; }
 
         public double[,] subjectiveMiddleRegretsMatrix;
         public double[,] SubjectiveMiddleRegretsMatrix
@@ -72,6 +84,29 @@ namespace OSA_Lab6.ViewModels
                 OnPropertyChanged("HomenyukMatrix");
             }
         }
+
+        public double[,] bayesMatrix;
+        public double[,] BayuesMatrix
+        {
+            get => bayesMatrix;
+            private set
+            {
+                bayesMatrix = value;
+                OnPropertyChanged("BayuesMatrix");
+            }
+        }
+
+        public double[,] hermeyerMatrix;
+        public double[,] HermeyerMatrix
+        {
+            get => hermeyerMatrix;
+            private set
+            {
+                hermeyerMatrix = value;
+                OnPropertyChanged("HermeyerMatrix");
+            }
+        }
+
 
         double[,] fullPMatrix;
         public double[,] FullPMatrix
@@ -103,6 +138,16 @@ namespace OSA_Lab6.ViewModels
                 OnPropertyChanged("PositiveMatrix");
             }
         }
+        double[,] negativeMatrix;
+        public double[,] NegativeMatrix
+        {
+            get => negativeMatrix;
+            private set
+            {
+                negativeMatrix = value;
+                OnPropertyChanged("NegativeMatrix");
+            }
+        }
 
 
         double[,] missedOpportunitiesMatrix;
@@ -122,8 +167,11 @@ namespace OSA_Lab6.ViewModels
         List<List<double>> Columns;
 
         List<List<double>> MissedOpportunities;
+
+        List<List<double>> Probability;
         #endregion
 
+        #region Converters
 
         private List<List<double>> ConvertArrToRowsList(double[,] values)
         {
@@ -157,7 +205,6 @@ namespace OSA_Lab6.ViewModels
             return result;
         }
 
-
         private double[,] ConvertListToArr(IEnumerable<IEnumerable<double>> values)
         {
             double[,] result = new double[values.Count(), values.First().Count()];
@@ -176,18 +223,16 @@ namespace OSA_Lab6.ViewModels
             return result;
         }
 
+        #endregion
 
 
-        public MainPageViewModel(double[,] AMatrix, double[,] PMatrix, double[,] SMatrix)
+        public MainPageViewModel(double[,] AMatrix, double[,] PMatrix)
         {
             SourceMatrix = AMatrix;
             this.PMatrix = PMatrix;
-            this.SMatrix = SMatrix;
             Rows = ConvertArrToRowsList(AMatrix);
             Columns = ConvertArrToColumnsList(AMatrix);
-
             Start();
-
         }
 
         public void Start()
@@ -207,7 +252,7 @@ namespace OSA_Lab6.ViewModels
             CalculateRegretsMatrix();
             CalculateFullPMatrix();
             CalculateSavage();
-            var LaplasRegrets = CalculateLaplas(MissedOpportunities,true);
+            var LaplasRegrets = CalculateLaplas(MissedOpportunities, true);
             LaplasRegretsCriterion = LaplasRegrets.value;
             LaplasRegretsCriterionIndex = LaplasRegrets.index;
             CalculateSubjectiveMiddleRegrets();
@@ -215,8 +260,17 @@ namespace OSA_Lab6.ViewModels
             CalculateHomenyuk();
 
 
+            //Часть 3
+
+            MaxProbability();
+            Bayes();
+            Hermeyer();
+
+
         }
 
+
+        #region First
 
         public void MaxMin()
         {
@@ -244,7 +298,7 @@ namespace OSA_Lab6.ViewModels
 
         public (double value, int index) CalculateLaplas(List<List<double>> source, bool regrets = false)
         {
-            var LaplasCriterion = regrets? source.Min(x => x.Average()): source.Max(x => x.Average());
+            var LaplasCriterion = regrets ? source.Min(x => x.Average()) : source.Max(x => x.Average());
             var LaplasCriterionIndex = source.FindIndex(x => x.Average() == LaplasCriterion) + 1;
 
             return (LaplasCriterion, LaplasCriterionIndex);
@@ -289,6 +343,9 @@ namespace OSA_Lab6.ViewModels
             }
         }
 
+        #endregion
+
+        #region Second
 
         public void CalculateRegretsMatrix()
         {
@@ -339,7 +396,7 @@ namespace OSA_Lab6.ViewModels
 
             foreach (var column in Columns)
             {
-                FullPMatrix[0, i] = Math.Round(column.Sum() / FullMatrixSum,4);
+                FullPMatrix[0, i] = Math.Round(column.Sum() / FullMatrixSum, 4);
                 i++;
             }
         }
@@ -373,7 +430,7 @@ namespace OSA_Lab6.ViewModels
 
             var temp = ConvertArrToRowsList(SubjectiveMiddleRegretsMatrix);
 
-            SubjectiveMiddleRegretsCriterion = temp.Min(x=>x.Sum());
+            SubjectiveMiddleRegretsCriterion = temp.Min(x => x.Sum());
             SubjectiveMiddleRegretsCriterionIndex = temp.FindIndex(x => x.Sum() == SubjectiveMiddleRegretsCriterion) + 1;
         }
 
@@ -393,6 +450,70 @@ namespace OSA_Lab6.ViewModels
 
             HomenyukCriterion = temp.Max(x => x.Sum());
             HomenyukCriterionIndex = temp.FindIndex(x => x.Sum() == HomenyukCriterion) + 1;
+        }
+        #endregion
+
+        public void MaxProbability()
+        {
+            Probability = ConvertArrToColumnsList(PMatrix);
+
+            var max = Probability.Max(x=>x.Max());
+            var index = Probability.FindIndex(x => x.Max() == max);
+
+            MaxProbabilityCriterion = Columns.Skip(index).Take(1).Max(x=>x.Max());
+            MaxProbabilityCriterionIndex = Columns.FindIndex(x => x.Max() == MaxProbabilityCriterion) + 1;
+        }
+
+        public void Bayes()
+        {
+            BayuesMatrix = new double[SourceMatrix.GetLength(0), SourceMatrix.GetLength(1)];
+
+            for (int i = 0; i < SourceMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < SourceMatrix.GetLength(1); j++)
+                {
+                    BayuesMatrix[i,j] = SourceMatrix[i,j] * PMatrix[0, j];
+                }
+            }
+
+            var temp = ConvertArrToRowsList(BayuesMatrix);
+
+            BayesCriterion = temp.Max(x => x.Sum());
+            BayesCriterionIndex = temp.FindIndex(x => x.Sum() == BayesCriterion) + 1;
+            
+        }
+
+        public void Hermeyer()
+        {
+            NegativeMatrix = new double[SourceMatrix.GetLength(0), SourceMatrix.GetLength(1)];
+            HermeyerMatrix = new double[SourceMatrix.GetLength(0), SourceMatrix.GetLength(1)];
+
+            var Max = Rows.Max(x => x.Max());
+            if (Max > 0)
+            {
+                for (int i = 0; i < NegativeMatrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < NegativeMatrix.GetLength(1); j++)
+                    {
+                        NegativeMatrix[i, j] = SourceMatrix[i,j] - Max - 1;
+                    }
+                }
+            }
+
+            for (int i = 0; i < HermeyerMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < HermeyerMatrix.GetLength(1); j++)
+                {
+                    HermeyerMatrix[i, j] = NegativeMatrix[i, j] * PMatrix[0, j];
+                }
+            }
+
+            var temp = ConvertArrToColumnsList(HermeyerMatrix);
+
+            HermeyerCriterion = temp.Min(x => x.Sum());
+            HermeyerCriterionIndex = temp.FindIndex(x => x.Sum() == HermeyerCriterion) + 1;
+
+
         }
 
     }

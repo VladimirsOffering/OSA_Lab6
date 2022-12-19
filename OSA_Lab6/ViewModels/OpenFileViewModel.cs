@@ -75,12 +75,10 @@ namespace OSA_Lab6.ViewModels
 
         string AFilePath;
         string PFilePath;
-        string SFilePath;
 
         double[,] resultA;
         double[,] resultP;
-        double[,] resultS;
-
+ 
         private async void OpenFile()
         {
             if (resultA == null)
@@ -133,9 +131,9 @@ namespace OSA_Lab6.ViewModels
                         //{
                         IsEnabled = false;
                         resultP = ExcelReader.Read(PFilePath);
-                        InfoMsg = "Осталось выбрать последний файл";
-                        ButtonText = "Выбор исходного файла с вероятностями S";
                         IsEnabled = true;
+                        InfoMsg = "Файлы успешно прочитаны, осталось запустить";
+                        ButtonText = "Начать";
                         return;
                         //});
 
@@ -149,37 +147,9 @@ namespace OSA_Lab6.ViewModels
 
             }
 
-            if (resultS == null)
-            {
-                SFilePath = openFileModel.OpenFile();
-                if (SFilePath == "")
-                {
-                    InfoMsg = "Файл не выбран, нужно выбрать еще раз";
-                    return;
-                }
-                else
-                {
-                    try
-                    {
-                        InfoMsg = "Попытка прочитать файл";
-                        //await Task.Run(()=> 
-                        //{
-                        IsEnabled = false;
-                        resultS = ExcelReader.Read(SFilePath);
-                        InfoMsg = "Файл успешно прочитан";
-                        //});
+            
 
-                    }
-                    catch (Exception e)
-                    {
-                        InfoMsg = $"Ошибка при чтении файла {e.Message}";
-                        IsEnabled = true;
-                    }
-                }
-
-            }
-
-            vm.CurrentPage = new MainPage(resultA,resultP,resultS);
+            vm.CurrentPage = new MainPage(resultA,resultP);
 
         }
     }

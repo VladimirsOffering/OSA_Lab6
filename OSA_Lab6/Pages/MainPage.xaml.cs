@@ -22,9 +22,9 @@ namespace OSA_Lab6.Pages
     public partial class MainPage : Page
     {
         MainPageViewModel vm;
-        public MainPage(double [,] A, double[,] P, double[,] S)
+        public MainPage(double [,] A, double[,] P)
         {
-            vm = new MainPageViewModel(A,P,S);
+            vm = new MainPageViewModel(A,P);
             this.DataContext = vm;
             InitializeComponent();
         }
